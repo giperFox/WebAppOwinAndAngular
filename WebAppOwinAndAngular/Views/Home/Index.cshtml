@@ -8,11 +8,32 @@
     <script>
         (function ($) {
 
-            angular.module('app1', []).controller('IndexController', function() {
+            angular.module('finance', [])
+                .factory('currencyConvertor', function () {
+                    var currencies = ['USD', 'CAD', 'CNY'];
+                    var rates = {
+                        'USD' : 1, 
+                        'CAD' : 0.9, 
+                        'CNY' : 6.09
+                    };
+
+                    var convert = function(amount, inCurrency, outCurrency) {
+                        return amount * rates[outCurrency] / rates[inCurrency];
+                    };
+
+                    return {
+                        currencies: currencies,
+                        convert: convert
+                    };
+            });
+
+            angular.module('app1', ['finance']).controller('IndexController', ['currencyConvertor', function(currencyConvertor) {
                 this.age = 26;
                 this.FirstName = 'Alex';
                 this.LastName = 'Kasatkin';
-            });
+                this.ActiveCurrency = "USD";
+                this.Currencies = currencyConvertor.currencies;
+            }]);
 
         })(jQuery);
     </script>
@@ -21,7 +42,9 @@
     <div class="col-md-4" ng-controller="IndexController as icontroller">
         First Name: <input id="txtFirstName" type="text" ng-model="icontroller.FirstName" /><br />
         Last Name: <input id="txtLastName" type="text" ng-model="icontroller.LastName" /><br />
-
+        <select ng-model="icontroller.ActiveCurrency">
+            <option ng-repeat="c in icontroller.Currencies">{{ c }}</option>
+        </select>
         <br />
         Full Name: {{ icontroller.FirstName + " " + icontroller.LastName }}
     </div>
